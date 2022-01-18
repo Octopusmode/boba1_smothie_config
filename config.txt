@@ -1,0 +1,339 @@
+# NOTE Lines must not exceed 132 characters
+# Robot module configurations : general handling of movement G-codes and slicing into moves
+default_feed_rate                            18000             # Default rate ( mm/minute ) for G1/G2/G3 moves
+default_seek_rate                            18000             # Default rate ( mm/minute ) for G0 moves
+mm_per_arc_segment                           0.5              # Arcs are cut into segments ( lines ), this is the length for
+                                                              # these segments.  Smaller values mean more resolution,
+                                                              # higher values mean faster computation
+mm_per_line_segment                          5                # Lines can be cut into segments ( not usefull with cartesian
+                                                              # coordinates robots ).
+
+# Arm solution configuration : CoreXY. Translates mm positions into stepper positions
+arm_solution      			     corexy	      # Тип кинематики принтера CoreXY
+alpha_steps_per_mm                           100              # Число шагов на мм для мотора оси Х
+beta_steps_per_mm                            100              # Число шагов на мм для мотора оси Y
+gamma_steps_per_mm                           400              # Число шагов на мм для мотора оси Z
+
+# Planner module configuration : Look-ahead and acceleration configuration
+planner_queue_size                           32               # DO NOT CHANGE THIS UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING
+acceleration                                 2500              # Ускорение для осей Х и Y в mm/second/second.
+z_acceleration                               200                # Ускорение для оси Z в mm/s^2, 0 uses acceleration which is the default. DO NOT SET ON A DELTA
+acceleration_ticks_per_second                1000             # Number of times per second the speed is updated
+junction_deviation                           0.01             # Similar to the old "max_jerk", in millimeters,
+                                                              # see https://github.com/grbl/grbl/blob/master/planner.c
+                                                              # and https://github.com/grbl/grbl/wiki/Configuring-Grbl-v0.8
+                                                              # Lower values mean being more careful, higher values means being
+                                                              # faster and have more jerk
+#z_junction_deviation                        0.0              # for Z only moves, -1 uses junction_deviation, zero disables junction_deviation on z moves DO NOT SET ON A DELTA
+#minimum_planner_speed                       0.0              # sets the minimum planner speed in mm/sec
+
+# ---------------------------------- Модуль конфигурации шаговых двигателей --------------------------------------------------------------------------
+
+microseconds_per_step_pulse                  1                # Duration of step pulses to stepper drivers, in microseconds
+base_stepping_frequency                      100000           # Base frequency for stepping, higher gives smoother movement
+
+# Ограничения скорости (Cartesian axis speed limits)
+x_axis_max_speed                             9000             # mm/min
+y_axis_max_speed                             9000             # mm/min
+z_axis_max_speed                             2000            # mm/min
+
+# Пины подключения шаговых двигателей ( ports, and pin numbers, appending "!" to the number will invert a pin )
+
+alpha_step_pin                              2.1              # Pin for beta stepper step signal
+alpha_dir_pin                               0.11            # Pin for beta stepper direction
+alpha_en_pin                                0.10             # Pin for beta enable
+alpha_max_rate                              9000.0			  # mm/min
+
+beta_step_pin                               2.0              # Pin for alpha stepper step signal
+beta_dir_pin                                0.5              # Pin for alpha stepper direction
+beta_en_pin                                 0.4              # Pin for alpha enable pin
+beta_max_rate                               9000.0          # mm/min
+
+gamma_step_pin                               2.2              # Pin for gamma stepper step signal
+gamma_dir_pin                                0.20!             # Pin for gamma stepper direction
+gamma_en_pin                                 0.19             # Pin for gamma enable
+gamma_max_rate                               2000.0            # mm/min
+
+
+# ---------------------------------- Модуль конфигурации serial communications -------------------------------------------------------------------------
+
+uart0.baud_rate                              115200           # Baud rate for the default hardware serial port
+second_usb_serial_enable                     true             # This enables a second usb serial port (to have both pronterface
+                                                              # and a terminal connected)
+
+# ---------------------------------- Модуль конфигурации первого экструдера ---------------------------------------------------------------------------
+
+extruder.hotend.enable                       true             # Активация первого экструдера с именем hotend
+extruder.hotend.steps_per_mm                 415  			# Шагов на мм для мотора первого экструдера #FM Bowden - 360, Bondtech -415
+extruder.hotend.default_feed_rate            1000           # Default rate ( mm/minute ) for moves where only the extruder moves
+extruder.hotend.acceleration                 5000            # Ускорение для шагового двигателя, as of 0.6, arbitrary ratio
+extruder.hotend.max_speed                    60             # Максимальная скорость mm/s
+
+extruder.hotend.step_pin                     2.3              # Pin for extruder step signal
+extruder.hotend.dir_pin                      0.22!             # Pin for extruder dir signal
+extruder.hotend.en_pin                       0.21             # Pin for extruder enable signal
+
+
+# ---------------------------------- Модуль конфигурации первого хотэнда -----------------------------------------------------------------------------
+
+temperature_control.hotend.enable            true             # Whether to activate this ( "hotend" ) module at all.
+                                                              # All configuration is ignored if false.
+temperature_control.hotend.thermistor_pin    0.24             # Pin for the thermistor to read
+temperature_control.hotend.heater_pin        2.5              # Pin that controls the heater, set to nc if a readonly thermistor is being defined   2.7
+temperature_control.hotend.thermistor        EPCOS100K         # see http://smoothieware.org/temperaturecontrol#toc5
+temperature_control.hotend.set_m_code        104              #
+temperature_control.hotend.set_and_wait_m_code 109            # M код команда ожидания достижения заданной температуры
+temperature_control.hotend.designator        T                #
+#M303 E0 C8 S230
+
+#Ceramic
+#temperature_control.hotend.p_factor         29.4          	# permanently set the PID values after an auto pid
+#temperature_control.hotend.i_factor         4.9            	#
+#temperature_control.hotend.d_factor         43              #
+#temperature_control.hotend.max_pwm          230
+
+#Standart
+temperature_control.hotend.p_factor         11.2          	# permanently set the PID values after an auto pid
+temperature_control.hotend.i_factor         0.501           	#
+temperature_control.hotend.d_factor         63           #
+temperature_control.hotend.max_pwm          180              # max pwm, 64 is a good value if driving a 12v resistor with 24v.
+
+
+temperature_control.hotend.max_temp         			320
+;temperature_control.hotend.runaway_heating_timeout      30
+;temperature_control.hotend.runaway_range      			30
+temperature_control.bed.runaway_cooling_timeout      	0
+# ---------------------------------- Модуль конфигурации температуры стола ---------------------------------------------------------------------------
+
+temperature_control.bed.enable               true             # Включение модуля контроля
+temperature_control.bed.thermistor_pin       0.23             # Пин подключения термистора стола
+temperature_control.bed.heater_pin           2.4             # Пин подключения нагревателя стола
+temperature_control.bed.thermistor           EPCOS100K        # Тип термистора стола see http://smoothieware.org/temperaturecontrol#toc5
+#temperature_control.bed.beta                3960             # или бэта значение, если тип термистора отсутствует в настройках or set the beta value
+
+temperature_control.bed.set_m_code           140              #
+temperature_control.bed.set_and_wait_m_code  190              #
+temperature_control.bed.designator           B                #
+temperature_control.bed.max_temp             150
+
+
+# ---------------------------------- Модуль конфигурации управления вентилятором ----------------------------------------------------------------------
+
+switch.fan.enable                            true             # Включение модуля управления вентилятором
+switch.fan.input_on_command                  M106             # Команда включения вентилятора
+switch.fan.input_off_command                 M107             # Команда отключения вентилятора
+switch.fan.output_pin                        2.7              # Пин подключения вентилятора
+switch.fan.output_type                       pwm              # Тип подключения вентилятора pwm output settable with S parameter in the input_on_comand
+switch.fan.max_pwm                           255              # set max pwm for the pin default is 255
+
+
+# ---------------------------------- Модуль конфигурации эндстопов -----------------------------------------------------------------------------------
+
+endstops_enable					true         # Включение модуля эндстопов (the endstop module is enabled by default and can be disabled here)
+corexy_homing					true         # Для HBot и CoreXY (set to true if homing on a hbot or corexy)
+
+alpha_min_endstop				1.24^        # add a ! to invert if endstop is NO connected to ground
+alpha_max_endstop				nc     # Установить значение nc если этот эндстоп не установлен
+alpha_homing_direction			home_to_min	 # or set to home_to_max and set alpha_max
+alpha_min					0                # this gets loaded after homing when home_to_min is set
+alpha_max					205              # this gets loaded after homing when home_to_max is set
+
+beta_min_endstop				1.26^        # Эндстоп по оси Y
+beta_max_endstop				nc           #
+beta_homing_direction			home_to_min  #
+beta_min					0                #
+beta_max					200              #
+
+gamma_min_endstop				1.28^        # Эндстоп по оси Z
+gamma_max_endstop				nc           #
+gamma_homing_direction			home_to_min  #
+gamma_min					0                #
+gamma_max					300              #
+
+
+soft_endstop.enable         true         # Enable soft endstops
+soft_endstop.x_min          0            # Minimum X position
+soft_endstop.x_max          200          # Maximum X position
+soft_endstop.y_min          0            # Minimum Y position
+soft_endstop.y_max          210          # Maximum Y position
+soft_endstop.z_min          -2            # Minimum Z position
+soft_endstop.z_max          300          # Maximum Z position
+soft_endstop.halt           false         # Whether to issue a HALT state when hitting a soft endstop (if false, will just ignore commands that would exceed the limit)
+
+
+alpha_fast_homing_rate_mm_s			70               # feedrates in mm/second
+beta_fast_homing_rate_mm_s			70               # "
+gamma_fast_homing_rate_mm_s			15               # "
+alpha_slow_homing_rate_mm_s			25               # "
+beta_slow_homing_rate_mm_s			25               # "
+gamma_slow_homing_rate_mm_s			5               # "
+
+alpha_homing_retract_mm				5                # distance in mm
+beta_homing_retract_mm				5                # "
+gamma_homing_retract_mm				8                # "
+
+# Z limit switch
+
+switch.z0_endstop.enable                     true
+switch.z0_endstop.input_pin                  1.23^
+switch.z0_endstop.output_on_command          M117 Z limit fault M112    # Z limit switch fault
+
+
+#endstop_debounce_count				75              # uncomment if you get noise on your endstops, default is 100
+
+# Only needed on a smoothieboard
+currentcontrol_module_enable			false
+
+return_error_on_unhandled_gcode			false
+
+# network settings
+network.enable					false            # enable the ethernet network services
+
+# Panel
+panel.enable                                 true             # set to true to enable the panel code
+ 
+panel.lcd viki2 # st7565_glcd
+panel.spi_channel                            0                 # spi channel to use  ; GLCD EXP1 Pins 3,5 (MOSI, SCLK)
+panel.spi_cs_pin                             1.22              # spi chip select     ; GLCD EXP1 Pin 4
+panel.a0_pin 2.6   
+panel.encoder_a_pin                          4.28!^            # encoder pin         ; GLCD EXP2 Pin 3
+panel.encoder_b_pin                          1.27!^            # encoder pin         ; GLCD EXP2 Pin 5
+ 
+panel.click_button_pin                       3.26!^            
+panel.buzz_pin                               1.30        
+ 
+ 
+ 
+#panel.pause_button_pin                       1.23!^             # kill/pause          ; GLCD EXP2 Pin 8 either
+ 
+panel.reverse 1
+ 
+panel.external_sd                            true              # set to true if there is an extrernal sdcard on the panel
+panel.external_sd.spi_channel                0                 # set spi channel the sdcard is on
+panel.external_sd.spi_cs_pin                 0.16              # set spi chip select for the sdcard
+panel.external_sd.sdcd_pin                  3.25!^            # sd detect signal (set to nc if no sdcard detect)
+      
+panel.contrast 19
+ 
+panel.menu_offset                            0                 # some panels will need 1 here
+panel.encoder_resolution                     4   
+ 
+panel.alpha_jog_feedrate                     6000				# x jogging feedrate in mm/min
+panel.beta_jog_feedrate                      6000				# y jogging feedrate in mm/min
+panel.gamma_jog_feedrate                     6000				# z jogging feedrate in mm/min
+ 
+panel.hotend_temperature                     215				# temp to set hotend when preheat is selected
+panel.bed_temperature                        80					# temp to set bed when preheat is selected
+
+# ---------------------------------- Модуль конфигурации управления подсветкой ----------------------------------------------------------------------
+
+switch.led.enable                            false            	# Enable this module
+switch.led.input_on_command                  M1110            	# This switch is turned on when M106A is sent
+switch.led.input_off_command                 M1111            	# This switch is turned off when M107 is sent
+switch.led.output_pin                        2.5              	# This pin is turned on when this switch is turned on, and vice-versa
+switch.led.output_type                       pwm              	# PWM output settable with S parameter in the input_on_comand
+switch.led.max_pwm                           255              	# Set max PWM for the pin default is 255
+
+# ---------------------------------- Модуль конфигурации управления датчиком филамента---------------------------------------------------------
+
+switch.filamentout.enable                true                   # Enable this module
+switch.filamentout.input_pin             1.29^                 # Pin where filament out button is connected
+switch.filamentout.output_on_command     suspend             	# Suspend command
+
+# ---------------------------------- Модуль скрипта автозагрузки и паузы ---------------------------------------------------------------------------
+after_suspend_gcode 					G91_G0E-5_G0Z5_G90_G0X0Y0 #retract, drop bed 5mm then go to 00
+before_resume_gcode 					G91_G0E1_G90 #prime 1mm then back to absolute positioning.
+
+leave_heaters_on_suspend				true
+
+# ---------------------------------- Модуль конфигурации меню ----------------------------------------------------------------------
+
+custom_menu.m_suspend.enable			true
+custom_menu.m_suspend.name				SUSPEND
+custom_menu.m_suspend.command			suspend
+
+custom_menu.m_resume.enable				true
+custom_menu.m_resume.name				RESUME
+custom_menu.m_resume.command			resume
+
+custom_menu.m_octo_suspend.enable		true
+custom_menu.m_octo_suspend.name			OCTOSUSPEND
+custom_menu.m_octo_suspend.command		@action:pause
+
+custom_menu.m_octo_resume.enable		true
+custom_menu.m_octo_resume.name			OCTORESUME
+custom_menu.m_octo_resume.command		@action:resume
+
+custom_menu.filament_change.enable		true
+custom_menu.filament_change.name		ChFil_SD
+custom_menu.filament_change.command		G91|G1Z10F1200|G1E-1F6000|G90|G1X0Y0F6000|G91|G1E-400F6000|G90|M25
+
+custom_menu.filament_resume.enable		true
+custom_menu.filament_resume.name		Resume_SD
+custom_menu.filament_resume.command		M24|G91|G1Z-10|G1E-1F6000|G90
+
+custom_menu.filament_feed.enable    	true
+custom_menu.filament_feed.name    		Feed_230C
+custom_menu.filament_feed.command    	M109S230|G91|G1E50F150|G90
+
+custom_menu.filament_push.enable    	true
+custom_menu.filament_push.name    		Push
+custom_menu.filament_push.command    	G91|G1E100F200|G90
+
+custom_menu.filament_eject.enable    	true
+custom_menu.filament_eject.name    		Eject_200C
+custom_menu.filament_eject.command    	M109S200|G91|G1E2F300|G1E-6F1000|G1E-400F6000|M109S230|G90
+
+custom_menu.bedposition_p1.enable    	true
+custom_menu.bedposition_p1.name    		C_Bottom_Middle
+custom_menu.bedposition_p1.command    	G28|G90|G1Z10F1000|G1X100Y0F6000|G1Z0F1000
+
+custom_menu.bedposition_p2.enable    	true
+custom_menu.bedposition_p2.name    		C_Top_Left
+custom_menu.bedposition_p2.command    	G28|G90|G1Z10F1000|G1X0Y190F6000|G1Z0F1000
+
+custom_menu.bedposition_p3.enable    	true
+custom_menu.bedposition_p3.name    		C_Top_Right
+custom_menu.bedposition_p3.command    	G28|G90|G1Z10F1000|G1X180Y190F6000|G1Z0F1000
+
+custom_menu.beddown_bd.enable    		true
+custom_menu.beddown_bd.name    			Bed_Down200mm
+custom_menu.beddown_bd.command    		G91|G1Z200F3500|M84
+
+custom_menu.fan100.enable    			true
+custom_menu.fan100.name    				Fan100
+custom_menu.fan100.command    			M117 Fan 100|M106|S255
+
+custom_menu.fan_50.enable    			true
+custom_menu.fan_50.name    				Fan50
+custom_menu.fan_50.command    			M117 Fan 50|M106|S126
+
+custom_menu.fan_30.enable    			true
+custom_menu.fan_30.name    				Fan30
+custom_menu.fan_30.command    			M117 Fan 30|M106|S50
+
+custom_menu.fan_off.enable    			true
+custom_menu.fan_off.name    			Fanoff
+custom_menu.fan_off.command    			M117 Fan off|M107
+
+custom_menu.auto_pid.enable				true  
+custom_menu.auto_pid.name    			AutoPID
+custom_menu.auto_pid.command  			M303E0C6S295
+
+custom_menu.high_tm.enable				true  
+custom_menu.high_tm.name    			HighTempMode
+custom_menu.high_tm.command  			M143|S0|P350
+
+custom_menu.auto_wrt.enable				true  
+custom_menu.auto_wrt.name    			Write EEPROM
+custom_menu.auto_wrt.command  			M500 
+pid.name    			AutoPID
+custom_menu.auto_pid.command  			M303E0C6S295
+
+custom_menu.high_tm.enable				true  
+custom_menu.high_tm.name    			HighTempMode
+custom_menu.high_tm.command  			M143|S0|P350
+
+custom_menu.auto_wrt.enable				true  
+custom_menu.auto_wrt.name    			Write EEPROM
+custom_menu.auto_wrt.command  			M500 
