@@ -16,7 +16,7 @@ gamma_steps_per_mm                           400              # Число ша�
 
 # Planner module configuration : Look-ahead and acceleration configuration
 planner_queue_size                           32               # DO NOT CHANGE THIS UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING
-acceleration                                 2500              # Ускорение для осей Х и Y в mm/second/second.
+acceleration                                 2700              # Ускорение для осей Х и Y в mm/second/second.
 z_acceleration                               200                # Ускорение для оси Z в mm/s^2, 0 uses acceleration which is the default. DO NOT SET ON A DELTA
 acceleration_ticks_per_second                1000             # Number of times per second the speed is updated
 junction_deviation                           0.01             # Similar to the old "max_jerk", in millimeters,
@@ -33,8 +33,8 @@ microseconds_per_step_pulse                  1                # Duration of step
 base_stepping_frequency                      100000           # Base frequency for stepping, higher gives smoother movement
 
 # Ограничения скорости (Cartesian axis speed limits)
-x_axis_max_speed                             9000             # mm/min
-y_axis_max_speed                             9000             # mm/min
+x_axis_max_speed                             12000             # mm/min
+y_axis_max_speed                             12000             # mm/min
 z_axis_max_speed                             2000            # mm/min
 
 # Пины подключения шаговых двигателей ( ports, and pin numbers, appending "!" to the number will invert a pin )
@@ -241,8 +241,9 @@ switch.filamentout.input_pin             1.29^                 # Pin where filam
 switch.filamentout.output_on_command     suspend             	# Suspend command
 
 # ---------------------------------- Модуль скрипта автозагрузки и паузы ---------------------------------------------------------------------------
-after_suspend_gcode 					G91_G0E-5_G0Z5_G90_G0X0Y0 #retract, drop bed 5mm then go to 00
-before_resume_gcode 					G91_G0E1_G90 #prime 1mm then back to absolute positioning.
+#after_suspend_gcode 					G91_G0E-5_G90_G0X0Y0 #retract, go to 00
+#before_resume_gcode 					G91_G0E1_G90 #prime 1mm then back to absolute positioning.
+#Managed by octoprint
 
 leave_heaters_on_suspend				true
 
